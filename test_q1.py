@@ -3,26 +3,32 @@ from q1 import nfa2dfa
 sigma = []
 sigma.append(['a', 'b'])
 sigma.append(['0', '1'])
+sigma.append(['a'])
 
 delta = []
 delta.append([[('a', 0), ('b', 0), ('a', 1)], [('b', 0)]])
 delta.append([[('1', 1), ('1', 2)], [('0', 3)], [('1', 3)], []])
+delta.append([[('a', 3)], [], [('a', 3)], [('a', 2), ('a', 1)]])
 
 f = []
 f.append([1])
 f.append([3])
+f.append([0, 1, 2])
 
 expected_states = []
 expected_states.append([[0],[0,1]])
 expected_states.append([[0],[],[1,2],[3]])
+expected_states.append([[0], [3], [1,2]])
 
 expected_delta = []
 expected_delta.append([[('a', [0,1]), ('b', [0])], [('a', [0,1]), ('b', [0])]])
 expected_delta.append([[('0',[]),('1',[1,2])], [('0',[]),('1',[])], [('0',[3]),('1',[3])], [('0',[]),('1',[])]])
+expected_delta.append([[('a', [3])], [('a', [1,2])], [('a', [3])]])
 
 expected_f = []
 expected_f.append([[0,1]])
 expected_f.append([[3]])
+expected_f.append([[0], [1,2]])
 
 for i in range(len(sigma)):
   print(f'\nTest {i+1}:')
