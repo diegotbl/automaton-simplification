@@ -1,63 +1,48 @@
 from q1 import nfa2dfa
 
-print('\nTest 1:')
+sigma = []
+sigma.append(['a', 'b'])
+sigma.append(['0', '1'])
 
-sigma = ['a', 'b']
-delta = [[('a', 0), ('b', 0), ('a', 1)], [('b', 0)]]
-f = [1]
+delta = []
+delta.append([[('a', 0), ('b', 0), ('a', 1)], [('b', 0)]])
+delta.append([[('1', 1), ('1', 2)], [('0', 3)], [('1', 3)], []])
 
-print('NFA:')
-print(f'sigma = {sigma}')
-print(f'Q = {[_ for _ in range(len(delta))]}')
-print(f'delta = {delta}')
-print(f'F = {f}\n')
+f = []
+f.append([1])
+f.append([3])
 
-expected_sigma = sigma
-expected_states = [[0],[0,1]]
-expected_delta = [[('a', [0,1]), ('b', [0])], [('a', [0,1]), ('b', [0])]]
-expected_f = [[0,1]]
+expected_states = []
+expected_states.append([[0],[0,1]])
+expected_states.append([[0],[],[1,2],[3]])
 
-print('Expected DFA:')
-print(f'sigma = {expected_sigma}')
-print(f'Q = {expected_states}')
-print(f'delta = {expected_delta}')
-print(f'F = {expected_f}\n')
+expected_delta = []
+expected_delta.append([[('a', [0,1]), ('b', [0])], [('a', [0,1]), ('b', [0])]])
+expected_delta.append([[('0',[]),('1',[1,2])], [('0',[]),('1',[])], [('0',[3]),('1',[3])], [('0',[]),('1',[])]])
 
-actual_sigma, actual_states, actual_delta, actual_f = nfa2dfa(sigma,delta,f)
+expected_f = []
+expected_f.append([[0,1]])
+expected_f.append([[3]])
 
-print('Actual DFA:')
-print(f'sigma = {actual_sigma}')
-print(f'Q = {actual_states}')
-print(f'delta = {actual_delta}')
-print(f'F = {actual_f}\n')
+for i in range(len(sigma)):
+  print(f'\nTest {i+1}:')
 
-print('\nTest 2:')
+  print('NFA:')
+  print(f'sigma = {sigma[i]}')
+  print(f'Q = {[_ for _ in range(len(delta[i]))]}')
+  print(f'delta = {delta[i]}')
+  print(f'F = {f[i]}\n')
 
-sigma = ['0', '1']
-delta = [[('1', 1), ('1', 2)], [('0', 3)], [('1', 3)], []]
-f = [3]
+  print('Expected DFA:')
+  print(f'sigma = {sigma[i]}')
+  print(f'Q = {expected_states[i]}')
+  print(f'delta = {expected_delta[i]}')
+  print(f'F = {expected_f[i]}\n')
 
-print('NFA:')
-print(f'sigma = {sigma}')
-print(f'Q = {[_ for _ in range(len(delta))]}')
-print(f'delta = {delta}')
-print(f'F = {f}\n')
+  actual_sigma, actual_states, actual_delta, actual_f = nfa2dfa(sigma[i],delta[i],f[i])
 
-expected_sigma = sigma
-expected_states = [[0],[],[1,2],[3]]
-expected_delta = [[('0',[]),('1',[1,2])], [('0',[]),('1',[])], [('0',[3]),('1',[3])], [('0',[]),('1',[])]]
-expected_f = [[3]]
-
-print('Expected DFA:')
-print(f'sigma = {expected_sigma}')
-print(f'Q = {expected_states}')
-print(f'delta = {expected_delta}')
-print(f'F = {expected_f}\n')
-
-actual_sigma, actual_states, actual_delta, actual_f = nfa2dfa(sigma,delta,f)
-
-print('Actual DFA:')
-print(f'sigma = {actual_sigma}')
-print(f'Q = {actual_states}')
-print(f'delta = {actual_delta}')
-print(f'F = {actual_f}')
+  print('Actual DFA:')
+  print(f'sigma = {actual_sigma}')
+  print(f'Q = {actual_states}')
+  print(f'delta = {actual_delta}')
+  print(f'F = {actual_f}\n')
