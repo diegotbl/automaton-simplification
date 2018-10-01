@@ -42,4 +42,7 @@ def nfa2dfa(*nfa):
         if final:
           new_f.append(next_state)
 
+  if 0 in f:
+    new_f.insert(0,[0])
+
   return (new_sigma, new_states, new_delta, new_f)
