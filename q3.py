@@ -21,7 +21,6 @@ def regex2nfa(regex):
   for node in graph.end:
     f.append(node.number)
   
-  print(sigma, delta, f)
   return (sigma, delta, f)
   
 
@@ -35,10 +34,12 @@ def enfa2nfa(enfa):
   
   eclosures = []
   parents = []
-
+  
+  for state in range((len(delta))):
+    parents.append([])
+  
   for state in range((len(delta))):
     eclosures.append([state])
-    parents.append([])
     for transition in delta[state]:
       parents[transition[1]].append(state)
 
@@ -48,9 +49,10 @@ def enfa2nfa(enfa):
 
     while idx < len(transitions):
       if transitions[idx][0] == '&':
+        next_state = transitions[idx][1]
         transitions.pop(idx)
-        eclosures[state].extend(calculate_eclosure(transitions[idx][1]))
-        if transitions[idx][1] in f:
+        eclosures[state].extend(calculate_eclosure(next_state))
+        if next_state in f:
           f.append(state)
       
       else:
@@ -64,26 +66,27 @@ def enfa2nfa(enfa):
   for state in range(len(delta)):
     for transition in delta[state]:
       for estate in eclosures[transition[1]][1:]:
-        delta[state].append(transition[0], estate)
-        parents[estate].append[state]
+        delta[state].append((transition[0], estate))
+        parents[estate].append(state)
 
     for estate in eclosures[state][1:]:
       for transition in delta[estate]:
-        delta[state].append(transition[0], estate)  
-        parents[estate].append[state]
+        delta[state].append((transition[0], transition[1]))  
+        parents[estate].append(state)
 
   
-  for state in range(len(delta)):
+  for state in range(1, len(delta)):
     if not parents[state]:
       delta[idx] = []
+
+  return (sigma, delta, f)
 
 
 def nfa2dfa(nfa):
   """
   Expects a NFA (Σ, Δ, F) and returns a minimized DFA (Σ, Q, δ, F)
   """  
-  print(q1.nfa2dfa(*nfa))
-  return(q2.dfa_minimization(q1.nfa2dfa(*nfa)))
+  return(q1.nfa2dfa(*nfa))
 
 
 def regex2dfa(regex):
@@ -105,19 +108,25 @@ def dfa2nfa(dfa):
   Expects a DFA (Σ, Q, δ, F) and enumerates its states assuming the 
   format (Σ, Δ, F)
   """
+
   sigma = dfa[0]
   states = dfa[1]
   delta = dfa[2]
   f = dfa[3]
 
-  states_map = {key: value for (value, key) in enumerate(states)}
+  states_map = {tuple(key): value for (value, key) in enumerate(states)}
   
-  for transitions in delta:
+  new_delta = []
+  for idx, transitions in enumerate(delta):
+    new_delta.append([])
     for transition in transitions:
-      transition[1] = states_map[transition[1]]
-
+      new_delta[idx].append((transition[0], states_map[tuple(transition[1])]))
+  
+  new_f = []
   for state in f:
-    state = states_map[state]
+    new_f.append(states_map[tuple(state)])
+  
+  return(sigma, new_delta, new_f)
 
 
 def union_regex(regex1, regex2):
@@ -132,27 +141,25 @@ def union_dfa(dfa1, dfa2):
   
   nstates1 = len(nfa1[1])
   
-  new_delta = [('&', 1), ( '&', nstates1 + 1)]
-  for transitions in nfa1[1]:
+  new_delta = [[('&', 1), ( '&', nstates1 + 1)]]
+  for idx, transitions in enumerate(nfa1[1]):
+    new_delta.append([])
     for transition in transitions:
-      transition[1] += 1  
+      new_delta[idx+1].append((transition[0], transition[1] + 1))  
 
-  for transitions in nfa2[1]:
+  for idx, transitions in enumerate(nfa2[1]):
+    new_delta.append([])
     for transition in transitions:
-      transition[1] += nstates1 + 1 
+      new_delta[idx+nstates1+1].append((transition[0], transition[1] + nstates1 + 1)) 
   
-  new_delta.extend(nfa1[1])
-  new_delta.extend(nfa2[1])
+  new_f = []
 
   for state in nfa1[2]:
-    state += 1
+    new_f.append(state + 1)
 
   for state in nfa2[2]:
-    state += nstates1 + 1
+    new_f.append(state + nstates1 + 1)
   
-  new_f.extend(nfa1[2])
-  new_f.extend(nfa2[2])
-
   enfa = [new_sigma, new_delta, new_f]
   return enfa2dfa(enfa)
 
