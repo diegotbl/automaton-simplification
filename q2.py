@@ -18,35 +18,53 @@ def dfa_minimization(dfa):
     aux_delta = delta.copy()
 
     # Percorrer d. Quando achar um 0 concatenar os estados e alterar o delta. Se esses estados forem finais, alterar f
+    for i, state in enumerate(new_q):
+      new_q[i] = [state]
+    
+    for i, final in enumerate(new_f):
+      new_f[i] = [final]
+
     for i, state in enumerate(q):
         for j in range(i):
             if d[i][j] == 0:
-                new_q.remove(q[i])
-                new_q.remove(q[j])
-                new_q.append([q[i], q[j]])
+                eq1 = []
+                eq2 = []
+                for eq in new_q:
+                  if q[i] in eq:
+                    new_q.remove(eq)
+                    eq1 = eq
+                  
+                  elif q[j] in eq:
+                    new_q.remove(eq)
+                    eq2 = eq                    
+                
+                new_eq = eq1 + eq2
+                new_q.append(new_eq)
 
                 for transition in aux_delta:
                     for index, t in enumerate(transition):
-                        if t[1] == q[i] or t[1] == q[j]:
+                        if t[1] in eq1 or t[1] in  eq2:
                             aux = list(t)
-                            aux[1] = [q[i], q[j]]
+                            aux[1] = new_eq
                             aux = tuple(aux)
                             transition[index] = aux
 
                 for final in f:
                     if state == final:
-                        new_f.remove(q[i])
-                        new_f.remove(q[j])
-                        new_f.append([q[i], q[j]])
+                        if eq1 in new_f:  
+                          new_f.remove(eq1)
+                        if eq2 in new_f:
+                           new_f.remove(eq2)
+                        new_f.append(new_eq)
 
-    for new_state in new_q:
-        if new_state not in q:
-            new_delta.append(aux_delta[new_state[0][0]])
-        elif new_state in q:
-            new_delta.append(aux_delta[q.index(new_state)])
-
+    for eq in new_q:
+        transitions = []
+        for state in eq:
+            transitions.extend(aux_delta[q.index(state)]) 
+        new_delta.append(transitions)
+       
     return (new_sigma, new_q, new_delta, new_f)
-
+ 
 
 def indistinguishable(sigma, q, delta, f):
     """
@@ -62,7 +80,7 @@ def indistinguishable(sigma, q, delta, f):
     d = [[0 for j in range(i)] for i, state in enumerate(q)]
     s = [[[] for j in range(i)] for i, state in enumerate(q)]
 
-    # Step 2: For every pair (i, j) with i < j, if one of these states is an accepting state and the other is not an
+    # Step 2: For every pair (i, j) with i > j, if one of these states is an accepting state and the other is not an
     # accepting state, set D[i, j] = 1
     for i, state in enumerate(q):
         for j in range(i):
@@ -97,17 +115,10 @@ def indistinguishable(sigma, q, delta, f):
                             flag = 1
                             break
                 if flag == 0:
-                    if i != m < n != j:
+                    if j != m < n != i:
                         s[n][m].append([i, j])
-                    elif j != m > n != i:
+                    elif i != m > n != j:
                         s[m][n].append([i, j])
-
-    print(d)
-    iterate = [x for x in range(len(q))]
-    del iterate[0]
-    for index in iterate:
-        if d[index][0] == 0:
-            print("This case may cause some problem! Please change q's and delta's original order")
 
     return d
 
