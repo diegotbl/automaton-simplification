@@ -12,9 +12,10 @@ def dfa_minimization(dfa):
     d = indistinguishable(sigma, q, delta, f)
 
     new_sigma = sigma
+    new_delta = []
+    new_f = f.copy()
     new_q = q.copy()
     aux_delta = delta.copy()
-    new_f = f.copy()
 
     # Percorrer d. Quando achar um 0 concatenar os estados e alterar o delta. Se esses estados forem finais, alterar f
     for i, state in enumerate(q):
@@ -38,14 +39,11 @@ def dfa_minimization(dfa):
                         new_f.remove(q[j])
                         new_f.append([q[i], q[j]])
 
-    new_delta = []
     for new_state in new_q:
-        if type(new_state) is list and new_state not in q:
-            new_delta.append(aux_delta[new_state[0]])
-        elif type(new_state) is list and new_state in q:
+        if new_state not in q:
+            new_delta.append(aux_delta[new_state[0][0]])
+        elif new_state in q:
             new_delta.append(aux_delta[q.index(new_state)])
-        else:
-            new_delta.append(aux_delta[new_state])
 
     return (new_sigma, new_q, new_delta, new_f)
 
@@ -103,6 +101,14 @@ def indistinguishable(sigma, q, delta, f):
                         s[n][m].append([i, j])
                     elif j != m > n != i:
                         s[m][n].append([i, j])
+
+    print(d)
+    iterate = [x for x in range(len(q))]
+    del iterate[0]
+    for index in iterate:
+        if d[index][0] == 0:
+            print("This case may cause some problem! Please change q's and delta's original order")
+
     return d
 
 
