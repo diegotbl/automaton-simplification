@@ -3,7 +3,7 @@ import nfa_generator, q1, q2
 
 def regex2nfa(regex):
   """
-  Expects a regex as a string and returns a NFA (Σ, Δ, F)
+  Expects a regex as a string and returns a NFA (Sigma, Delta, F)
   """
   graph = nfa_generator.Graph(regex)
 
@@ -26,7 +26,7 @@ def regex2nfa(regex):
 
 def enfa2nfa(enfa):
   """
-  Expects an eps-NFA (Σ, Δ, F) and returns a NFA (Σ, Δ', F')
+  Expects an eps-NFA (Sigma, Delta, F) and returns a NFA (Sigma, Delta', F')
   """
   sigma = enfa[0]
   delta = enfa[1]
@@ -84,29 +84,29 @@ def enfa2nfa(enfa):
 
 def nfa2dfa(nfa):
   """
-  Expects a NFA (Σ, Δ, F) and returns a minimized DFA (Σ, Q, δ, F)
-  """  
-  return(q1.nfa2dfa(*nfa))
+  Expects a NFA (Sigma, Delta, F) and returns a DFA (Sigma, Q, delta, F)
+  """
+  return (q1.nfa2dfa(*nfa))
 
 
 def regex2dfa(regex):
   """
-  Expects a regex as a string and returns a DFA (Σ, Q, δ, F)
+  Expects a regex as a string and returns a DFA (Sigma, Q, delta, F)
   """
-  return(nfa2dfa(regex2nfa(regex)))
+  return (nfa2dfa(regex2nfa(regex)))
 
 
 def enfa2dfa(enfa):
   """
-  Expects a eps-NFA (Σ, Δ, F) and returns a minimized DFA (Σ, Q, δ, F)
+  Expects a eps-NFA (Sigma, Delta, F) and returns a minimized DFA (Sigma, Q, delta, F)
   """
-  return(nfa2dfa(enfa2nfa(enfa)))
+  return (nfa2dfa(enfa2nfa(enfa)))
 
 
 def dfa2nfa(dfa):
   """
-  Expects a DFA (Σ, Q, δ, F) and enumerates its states assuming the 
-  format (Σ, Δ, F)
+  Expects a DFA (Sigma, Q, delta, F) and enumerates its states assuming the
+  format (Sigma, Delta, F)
   """
 
   sigma = dfa[0]
@@ -126,7 +126,7 @@ def dfa2nfa(dfa):
   for state in f:
     new_f.append(states_map[tuple(state)])
   
-  return(sigma, new_delta, new_f)
+  return (sigma, new_delta, new_f)
 
 
 def union_regex(regex1, regex2):
@@ -186,11 +186,14 @@ def complement_regex(regex):
 
 def complement_nfa(nfa):
   dfa = nfa2dfa(nfa)
-  return complement_dfa(dfa)
+  return q2.dfa_minimization(complement_dfa(dfa))
 
 
 def intersect_regex(regex1, regex2):
+  """
+  Evaluates the intersection of 2 regex and returns the simplified automaton
+  """
   dfa1 = complement_regex(regex1)
   dfa2 = complement_regex(regex2)
 
-  return complement_dfa(union_dfa(dfa1, dfa2)) 
+  return q2.dfa_minimization(complement_dfa(union_dfa(dfa1, dfa2)))

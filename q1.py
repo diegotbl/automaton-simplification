@@ -1,12 +1,12 @@
 def nfa2dfa(*nfa):
-  """Expects NFA to be in a (Σ, Δ, F), where Σ is a a list with the symbols
-  of the alphabet, like [a, b]; Δ is the transistion function, specified as
+  """Expects NFA to be in a (Sigma, Delta, F), where Sigma is a a list with the symbols
+  of the alphabet, like [a, b]; Delta is the transistion function, specified as
   a list of lists of tuples, like [[(a,0), (b,1)], [(a,1), (b,1)]] - where 0 and
   1 are the states and 'a' and 'b' are the symbols, this means that if the tape
   is in state 0 and receives an 'a' it will go to state 0 again and if it recei-
   ves a 'b' it will go to state 1, and if the state is 1 it remains 1; and F is
-  a list with the final states, like [1]. The states are assumend to be from 0
-  to len(Δ), with 0 being the initial state. The function returns (Σ, Q, δ, F),
+  a list with the final states, like [1]. The states are assumed to be from 0
+  to len(Delta), with 0 being the initial state. The function returns (Sigma, Q, delta, F),
   which represents the equivalent DFA with a format identical to the one
   described here."""
 

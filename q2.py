@@ -1,7 +1,7 @@
 def dfa_minimization(dfa):
     """
-    :param dfa: tuple containing Σ, Q, δ, F as specified at q1.py
-    :return: tuple containing Σ, Q', δ', F'
+    :param dfa: tuple containing Sigma, Q, delta, F as specified at q1.py
+    :return: tuple containing Sigma, Q', delta', F'
     """
 
     sigma = dfa[0]
@@ -19,10 +19,17 @@ def dfa_minimization(dfa):
 
     # Percorrer d. Quando achar um 0 concatenar os estados e alterar o delta. Se esses estados forem finais, alterar f
     for i, state in enumerate(new_q):
-      new_q[i] = [state]
-    
+        new_q[i] = [state]
+
+    for transitions in aux_delta:
+        for i, t in enumerate(transitions):
+            aux = list(t)
+            aux[1] = [aux[1]]
+            aux = tuple(aux)
+            transitions[i] = aux
+
     for i, final in enumerate(new_f):
-      new_f[i] = [final]
+        new_f[i] = [final]
 
     for i, state in enumerate(q):
         for j in range(i):
@@ -30,28 +37,28 @@ def dfa_minimization(dfa):
                 eq1 = []
                 eq2 = []
                 for eq in new_q:
-                  if q[i] in eq:
-                    new_q.remove(eq)
-                    eq1 = eq
+                    if q[i] in eq:
+                        new_q.remove(eq)
+                        eq1 = eq
                   
-                  elif q[j] in eq:
-                    new_q.remove(eq)
-                    eq2 = eq                    
+                    elif q[j] in eq:
+                        new_q.remove(eq)
+                        eq2 = eq
                 
                 new_eq = eq1 + eq2
                 new_q.append(new_eq)
 
                 for transition in aux_delta:
-                    for index, t in enumerate(transition):
-                        if t[1] in eq1 or t[1] in  eq2:
-                            aux = list(t)
-                            aux[1] = new_eq
-                            aux = tuple(aux)
-                            transition[index] = aux
+                        for index, t in enumerate(transition):
+                            if t[1] == eq1 or t[1] == eq2:
+                                aux = list(t)
+                                aux[1] = new_eq
+                                aux = tuple(aux)
+                                transition[index] = aux
 
                 for final in f:
                     if state == final:
-                        if eq1 in new_f:  
+                        if eq1 in new_f:
                           new_f.remove(eq1)
                         if eq2 in new_f:
                            new_f.remove(eq2)
@@ -62,7 +69,12 @@ def dfa_minimization(dfa):
         for state in eq:
             transitions.extend(aux_delta[q.index(state)]) 
         new_delta.append(transitions)
-       
+
+    # Eliminate repeated transitions in new_delta
+    for transitions in new_delta:
+        while len(transitions) > len(new_sigma):
+            transitions.pop()
+
     return (new_sigma, new_q, new_delta, new_f)
  
 
@@ -114,11 +126,21 @@ def indistinguishable(sigma, q, delta, f):
                             dist(i, j, d, s)
                             flag = 1
                             break
-                if flag == 0:
-                    if j != m < n != i:
-                        s[n][m].append([i, j])
-                    elif i != m > n != j:
-                        s[m][n].append([i, j])
+
+                for symbol in sigma:
+                    delta_state = delta[i]
+                    for transition in delta_state:
+                        if transition[0] == symbol:
+                            m = q.index(transition[1])
+                    delta_state = delta[j]
+                    for transition in delta_state:
+                        if transition[0] == symbol:
+                            n = q.index(transition[1])
+                    if flag == 0:
+                        if j != m < n != i:
+                            s[n][m].append([i, j])
+                        elif i != m > n != j:
+                            s[m][n].append([i, j])
 
     return d
 
